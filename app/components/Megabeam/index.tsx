@@ -13,6 +13,7 @@ const vertexShader = `
 
 const fragmentShader = `
   uniform vec2 u_resolution;
+  uniform float u_time;
   varying vec2 vUv;
 
   void main() {
@@ -20,7 +21,8 @@ const fragmentShader = `
     st.x *= u_resolution.x / u_resolution.y;
 
     float barWidth = 5.0;
-    float color = step(5.0, mod(st.x / barWidth, 10.0));
+    float speed = 50.0;
+    float color = step(5.0, mod(st.x + u_time * speed, 10.0));
 
     gl_FragColor = vec4(vec3(color, 1.0, 1.0), 1.0);
   }
@@ -35,6 +37,13 @@ export const MegaBeam = (props: ThreeElements['mesh']) => {
   // Subscribe this component to the render-loop, rotate the mesh every frame
   // Return view, these are regular three.js elements expressed in JSX
 
+  useFrame(({ clock }) => {
+    if (meshRef.current) {
+      console.log('clock', clock.getElapsedTime());
+      meshRef.current.material.uniforms.u_time.value = clock.getElapsedTime();
+    }
+  })
+
   return (
     <mesh
       {...props}
@@ -47,7 +56,8 @@ export const MegaBeam = (props: ThreeElements['mesh']) => {
         fragmentShader={fragmentShader}
         blending={THREE.AdditiveBlending}
         uniforms={{
-          u_resolution: { value: [window.innerWidth, window.innerHeight] }
+          u_resolution: { value: [window.innerWidth, window.innerHeight] },
+          u_time: { value: 0.0 }
         }}
       />
     </mesh>
