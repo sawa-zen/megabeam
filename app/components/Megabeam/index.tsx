@@ -20,11 +20,11 @@ const fragmentShader = `
     vec2 st = vUv * u_resolution;
     st.x *= u_resolution.x / u_resolution.y;
 
-    float barWidth = 5.0;
+    float barWidth = 4.0;
     float speed = 50.0;
-    float color = step(5.0, mod(st.x + u_time * speed, 10.0));
+    float color = step(5.0, mod(st.x + u_time * speed, barWidth * 2.0));
 
-    gl_FragColor = vec4(vec3(color, 1.0, 1.0), 1.0);
+    gl_FragColor = vec4(vec3(0.0, color, color), 1.0);
   }
 `;
 
@@ -55,6 +55,8 @@ export const MegaBeam = (props: ThreeElements['mesh']) => {
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
         blending={THREE.AdditiveBlending}
+        depthWrite
+        transparent
         uniforms={{
           u_resolution: { value: [window.innerWidth, window.innerHeight] },
           u_time: { value: 0.0 }
