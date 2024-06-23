@@ -1,56 +1,28 @@
 import * as THREE from 'three'
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { ThreeElements, useFrame } from '@react-three/fiber'
-
-const vertexShader = `
-  varying vec2 vUv;
-
-  void main() {
-    vUv = uv;
-    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-  }
-`;
-
-const fragmentShader = `
-  uniform vec2 u_resolution;
-  uniform float u_time;
-  varying vec2 vUv;
-
-  void main() {
-    vec2 st = vUv * u_resolution;
-    st.x *= u_resolution.x / u_resolution.y;
-
-    float barWidth = 4.0;
-    float speed = 50.0;
-    float color = step(5.0, mod(st.x + u_time * speed, barWidth * 2.0));
-
-    gl_FragColor = vec4(vec3(0.0, color, color), 1.0);
-  }
-`;
-
+import vertexShader from './vertex.glsl?raw'
+import fragmentShader from './fragment.glsl?raw'
 
 // https://youtu.be/a_2fEMJeXhM?t=599
 export const MegaBeam = (props: ThreeElements['mesh']) => {
   // This reference will give us direct access to the mesh
-  const meshRef = useRef<THREE.Mesh>(null!)
+  const materialRef = useRef<THREE.ShaderMaterial>(null!)
   // Set up state for the hovered and active state
   // Subscribe this component to the render-loop, rotate the mesh every frame
   // Return view, these are regular three.js elements expressed in JSX
 
   useFrame(({ clock }) => {
-    if (meshRef.current) {
-      console.log('clock', clock.getElapsedTime());
-      meshRef.current.material.uniforms.u_time.value = clock.getElapsedTime();
+    if (materialRef.current) {
+      materialRef.current.uniforms.u_time.value = clock.getElapsedTime();
     }
   })
 
   return (
-    <mesh
-      {...props}
-      ref={meshRef}
-    >
+    <mesh {...props}>
       <planeGeometry args={[10, 0.3]} />
       <shaderMaterial
+        ref={materialRef}
         side={THREE.DoubleSide}
         vertexShader={vertexShader}
         fragmentShader={fragmentShader}
