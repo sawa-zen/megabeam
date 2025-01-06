@@ -42,6 +42,9 @@ createRoot(root).render(
   <Canvas>
     <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} decay={0} intensity={Math.PI} />
     <pointLight position={[-10, -10, -10]} decay={0} intensity={Math.PI} />
-    <Box position={[-1.2, 0, 0]} />
+    <mesh>
+      <planeGeometry args={[5, 0.5]} />
+      <meshBasicMaterial color="lightblue" />
+    </mesh>
   </Canvas>,
 )
